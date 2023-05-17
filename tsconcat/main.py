@@ -20,10 +20,9 @@ import argparse
 def timeprint(title: str):
     print(f'Start: {title}')
     start = time.perf_counter()
-    def _resolve():
-        duration = time.perf_counter()-start
-        print(f'Done: {title} - {datetime.timedelta(seconds=duration)}')
-    yield _resolve
+    yield
+    duration = time.perf_counter()-start
+    print(f'Done: {title} - {datetime.timedelta(seconds=duration)}')
     
 
 
