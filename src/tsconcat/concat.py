@@ -1,6 +1,6 @@
 import pathlib as pl
 from os import PathLike
-from typing import Iterable, Union
+from typing import Iterable, List, Union
 
 import nibabel as nib
 import numpy as np
@@ -14,9 +14,9 @@ def concat_nifti1_4d(
     if len(paths) == 0:
         raise Exception("Empty path list.")
 
-    img_handles = [nib.nifti1.Nifti1Image.load(p) for p in paths]
+    img_handles: List[nib.nifti1.Nifti1Image] = [nib.nifti1.Nifti1Image.load(p) for p in paths]  # type: ignore
 
-    img_affines = [img.affine for img in img_handles]
+    img_affines: List[np.ndarray] = [img.affine for img in img_handles]
 
     affs = np.asarray(img_affines)
     if not np.all(affs == affs[0, :, :]):

@@ -6,10 +6,9 @@ from hashlib import sha1
 import bids2table.helpers
 import pandas as pd
 
-from tsconcat.utils import timeprint
-
 from .b2t import b2t_cpac
 from .concat import concat_nifti1_4d
+from .utils import timeprint
 
 
 def main():
