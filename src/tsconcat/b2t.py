@@ -9,6 +9,9 @@ import pandas as pd
 
 
 def _remove_cpac_provenance(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Remove (massive) C-PAC provenance field from bids2table output.
+    """
     def _remove_cprov(x):
         x.pop("CpacProvenance", None)
         return x
@@ -20,6 +23,9 @@ def _remove_cpac_provenance(df: pd.DataFrame) -> pd.DataFrame:
 def b2t_cpac(
     bids_dir: Union[str, PathLike], parquet_cache_dir: Union[str, PathLike]
 ) -> pd.DataFrame:
+    """
+    Run bids2table on a BIDS directory and return a pandas DataFrame.
+    """
     parquet_cache_dir = pl.Path(parquet_cache_dir)
     if not parquet_cache_dir.exists():
         elbow.utils.setup_logging("ERROR")

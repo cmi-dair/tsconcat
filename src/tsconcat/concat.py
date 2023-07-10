@@ -9,6 +9,17 @@ import numpy as np
 def concat_nifti1_4d(
     paths: Iterable[Union[str, PathLike]], out_path: Union[str, PathLike]
 ) -> None:
+    """
+    Concat 4D Nifti files.
+
+    Args:
+        paths: Paths to 4D Nifti files.
+        out_path: Path to output 4D Nifti file.
+    
+    Raises:
+        Exception: If affines are not equal.
+        Exception: If path list is empty.
+    """
     paths = [pl.Path(p) for p in paths]
 
     if len(paths) == 0:
