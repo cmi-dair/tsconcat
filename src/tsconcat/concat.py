@@ -15,7 +15,7 @@ def concat_nifti1_4d(
     Args:
         paths: Paths to 4D Nifti files.
         out_path: Path to output 4D Nifti file.
-    
+
     Raises:
         Exception: If affines are not equal.
         Exception: If path list is empty.
