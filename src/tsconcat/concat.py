@@ -6,7 +6,9 @@ import nibabel as nib
 import numpy as np
 
 
-def concat_nifti1_4d(paths: Iterable[Union[str, PathLike]], out_path: Union[str, PathLike]) -> None:
+def concat_nifti1_4d(
+    paths: Iterable[Union[str, PathLike]], out_path: Union[str, PathLike]
+) -> None:
     paths = [pl.Path(p) for p in paths]
 
     if len(paths) == 0:
