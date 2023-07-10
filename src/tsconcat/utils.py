@@ -21,7 +21,7 @@ def timeprint(title: str):
     print(f"Done: {title} - {datetime.timedelta(seconds=duration)}")
 
 
-def _build_bidsapp_group_parser(*args, **kwargs):
+def build_bidsapp_group_parser(*args, **kwargs):
     """
     Build a parser skeleton for the BIDS App group level.
 
