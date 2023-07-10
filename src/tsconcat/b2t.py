@@ -12,6 +12,7 @@ def _remove_cpac_provenance(df: pd.DataFrame) -> pd.DataFrame:
     """
     Remove (massive) C-PAC provenance field from bids2table output.
     """
+
     def _remove_cprov(x):
         x.pop("CpacProvenance", None)
         return x

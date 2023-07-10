@@ -30,10 +30,7 @@ def build_bidsapp_group_parser(*args, **kwargs):
         kwargs: Keyword arguments to be passed to ArgumentParser costructor.
     """
 
-    parser = argparse.ArgumentParser(
-        *args,
-        **kwargs
-    )
+    parser = argparse.ArgumentParser(*args, **kwargs)
     parser.add_argument(
         "bids_dir",
         action="store",
@@ -47,8 +44,6 @@ def build_bidsapp_group_parser(*args, **kwargs):
         help="Output BIDS folder path.",
     )
     parser.add_argument(
-        "analysis_level",
-        choices=["group"],
-        help='Processing stage, must be "group".'
+        "analysis_level", choices=["group"], help='Processing stage, must be "group".'
     )
     return parser

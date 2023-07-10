@@ -12,8 +12,7 @@ from .utils import timeprint, build_bidsapp_group_parser
 
 def main():
     parser = build_bidsapp_group_parser(
-        prog="grag-tsconcat",
-        description="Concatenate MRI timeseries."
+        prog="grag-tsconcat", description="Concatenate MRI timeseries."
     )
 
     parser.add_argument("-g", "--group_by", type=str, help="Group by", default="sub")
@@ -33,10 +32,7 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     temp_dir = output_dir / f'temp_{sha1(str(input_dir).encode("utf-8")).hexdigest()}'
 
-    df = b2t_cpac(
-        bids_dir=input_dir,
-        parquet_cache_dir=temp_dir
-    )
+    df = b2t_cpac(bids_dir=input_dir, parquet_cache_dir=temp_dir)
 
     def fun(df: pd.DataFrame):
         with timeprint(f"Processing: {df.name}"):
@@ -58,9 +54,9 @@ def main():
             concat_nifti1_4d(paths=df_bold.file_path.values, out_path=out_path)
 
             sidecar_path = (
-                    output_dir
-                    / "out"
-                    / bids2table.helpers.join_bids_path({**first_row, "ext": ".json"})
+                output_dir
+                / "out"
+                / bids2table.helpers.join_bids_path({**first_row, "ext": ".json"})
             )
             with open(sidecar_path, "w", encoding="utf-8") as fp:
                 json.dump(first_row["sidecar"], fp)
