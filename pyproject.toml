@@ -41,4 +41,4 @@ pythonpath = [
 ignore_missing_imports = true
 
 [tool.poetry.scripts]
-grag-tsconcat = "tsconcat.cli:main"
+ba-tsconcat = "tsconcat.cli:main"

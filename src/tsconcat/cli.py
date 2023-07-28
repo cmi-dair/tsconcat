@@ -71,12 +71,12 @@ def _reduce_op(
 
 def main():
     parser = build_bidsapp_group_parser(
-        prog="grag-tsconcat", description="Concatenate MRI timeseries."
+        prog="ba-tsconcat", description="Concatenate MRI timeseries."
     )
 
     parser.add_argument(
         "-c", "--concat", type=str,
-        help=f"Concat across. Can be any combination of {', '.join(REDUCE_COLUMNS)} separated by spaces."
+        help=f"Concat across. Can be any combination of {', '.join(REDUCE_COLUMNS)} separated by spaces. "
              f"Output data will be grouped by the set difference.",
         default="ses"
     )
@@ -84,7 +84,7 @@ def main():
     parser.add_argument(
         "-d", "--dry_run",
         action="store_true",
-        help="Dry run. Print output directory structure instead of actually doing something."
+        help="Dry run. Print output directory structure instead of actually doing something. "
              "If this is enabled 'bids_dir' may be a path to a bids2table parquet directory.",
         default=False
     )
@@ -116,6 +116,7 @@ def main():
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
 
+    # We dont care about these
     df = df.droplevel(0, axis="columns")
 
     df_bold = df.query(
