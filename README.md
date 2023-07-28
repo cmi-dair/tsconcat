@@ -1,4 +1,4 @@
-# tsconcat
+# `tsconcat`
 
 [![Build](https://github.com/cmi-dair/tsconcat/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/cmi-dair/tsconcat/actions/workflows/test.yaml?query=branch%3Amain)
 [![codecov](https://codecov.io/gh/cmi-dair/tsconcat/branch/main/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/cmi-dair/tsconcat)
