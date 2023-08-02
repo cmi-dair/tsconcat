@@ -103,6 +103,7 @@ def main():
     concat_labels: List[str] = args.concat.split(' ')
     dry_run: bool = args.dry_run
     fake: bool = args.fake
+    dry_run = dry_run or fake
 
     if not input_dir.exists():
         raise Exception("Input directory does not exist.")
@@ -158,6 +159,9 @@ def main():
         if dry_run else
         _process_group
     )
+
+    if fake:
+        df_reduced_bold.to_parquet(output_dir)
 
     filepaths = file_paths_from_b2table(df_reduced_bold)
     pretreeprint(filepaths)

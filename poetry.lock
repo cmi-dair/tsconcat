@@ -2,7 +2,7 @@
 
 [[package]]
 name = "bids2table"
-version = "0.1.dev29+gb7b1658"
+version = "0.1.dev34+g886d184"
 description = "Efficiently index large-scale BIDS datasets and derivatives"
 optional = false
 python-versions = ">=3.7"
