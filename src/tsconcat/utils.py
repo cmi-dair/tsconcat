@@ -53,7 +53,7 @@ def build_bidsapp_group_parser(*args, **kwargs):
     return parser
 
 
-def file_paths_from_b2table(df: pd.DataFrame, inplace=False) -> List[pl.Path]:
+def file_paths_from_b2table(df: pd.DataFrame, include_sidecars=False, inplace=False) -> List[pl.Path]:
     """Generate list of filepaths from bids2table dataframe."""
 
     # b2t crashes if sidecar is not None
@@ -61,11 +61,19 @@ def file_paths_from_b2table(df: pd.DataFrame, inplace=False) -> List[pl.Path]:
         df = df.copy()
     df['sidecar'] = None
 
-    paths_series: pd.Series = df.apply(
+    paths = list(df.apply(
         func=lambda row: bids2table.helpers.join_bids_path(row),
         axis=1
-    )
-    return list(paths_series.values)
+    ).values)
+
+    if include_sidecars:
+        sidecar_paths = list(df.apply(
+            func=lambda row: bids2table.helpers.join_bids_path({**row, "ext": ".json"}),
+            axis=1
+        ).values)
+        return paths + sidecar_paths
+
+    return paths
 
 
 def file_path_from_b2table_row(row: pd.Series, inplace=False, sidecar=False) -> pl.Path:

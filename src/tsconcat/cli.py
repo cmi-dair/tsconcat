@@ -176,7 +176,7 @@ def main():
         })
         df_reduced_bold.to_parquet(output_dir)
 
-    filepaths = file_paths_from_b2table(df_reduced_bold)
+    filepaths = file_paths_from_b2table(df_reduced_bold, include_sidecars=True)
     pretreeprint(filepaths)
 
 

@@ -35,7 +35,7 @@ pip install git+https://github.com/cmi-dair/tsconcat
 ## Quick start
 
 ```sh
-ba-tsconcat /path/to/input/bids /path/to/output --concat ses --dry_run
+ba-tsconcat /path/to/input/bids /path/to/output group --concat ses --dry_run
 ```
 
 
