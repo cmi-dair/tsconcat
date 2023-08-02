@@ -5,12 +5,15 @@ from typing import List, Optional
 
 import bids2table.helpers
 import elbow.dtypes  # noqa  makes pandas load json types as dicts from parquet
+import elbow.utils
 import pandas as pd
 
 from tsconcat.pretreeprint import pretreeprint
 from .concat import concat_nifti1_4d
 from .utils import build_bidsapp_group_parser, file_path_from_b2table_row, sidecar_path_from_b2table_row, \
     file_paths_from_b2table
+
+elbow.utils.setup_logging("ERROR")
 
 REDUCE_COLUMNS = ["dataset", "sub", "ses", "run"]
 REDUCE_COLUMNS_SET = set(REDUCE_COLUMNS)

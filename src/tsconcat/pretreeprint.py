@@ -1,7 +1,10 @@
 import pathlib as pl
 from os import PathLike
 from typing import List, Union, Optional
-from rich import print as rich_print
+
+from rich.console import Console
+
+console = Console(highlight=False)
 
 
 def tree_from_paths(paths: List[Union[str, PathLike]]):
@@ -81,7 +84,7 @@ def tree_print(tree: dict, indents: Optional[List[bool]] = None):
         ]
 
         total_indent = ''.join(indent_list)
-        rich_print(f'{total_indent}{k}')
+        console.print(f'{total_indent}{k}')
         tree_print(v, indents + [not is_last_child])
 
 
