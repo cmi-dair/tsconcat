@@ -10,8 +10,12 @@ import pandas as pd
 
 from tsconcat.pretreeprint import pretreeprint
 from .concat import concat_nifti1_4d
-from .utils import build_bidsapp_group_parser, file_path_from_b2table_row, sidecar_path_from_b2table_row, \
-    file_paths_from_b2table
+from .utils import (
+    build_bidsapp_group_parser,
+    file_path_from_b2table_row,
+    sidecar_path_from_b2table_row,
+    file_paths_from_b2table,
+)
 
 elbow.utils.setup_logging("ERROR")
 
@@ -20,10 +24,10 @@ REDUCE_COLUMNS_SET = set(REDUCE_COLUMNS)
 
 
 def _reduce_op(
-        df: pd.DataFrame,
-        group_by: List[str],
-        inplace=False,
-        group_callback: Optional[Callable[[pd.DataFrame], None]] = None
+    df: pd.DataFrame,
+    group_by: List[str],
+    inplace=False,
+    group_callback: Optional[Callable[[pd.DataFrame], None]] = None,
 ):
     """
     Reduce dataframe to one row per group.
@@ -35,21 +39,14 @@ def _reduce_op(
 
     unknown_cols = list(group_by_set - REDUCE_COLUMNS_SET)
     if len(unknown_cols) > 0:
-        raise Exception(f'Unknown columns: {unknown_cols}')
+        raise Exception(f"Unknown columns: {unknown_cols}")
     del unknown_cols
 
-    df.sort_values(
-        by=REDUCE_COLUMNS,
-        inplace=True
-    )
+    df.sort_values(by=REDUCE_COLUMNS, inplace=True)
 
-    grouped = df.groupby(
-        by=list(REDUCE_COLUMNS_SET - group_by_set),
-        dropna=False
-    )
+    grouped = df.groupby(by=list(REDUCE_COLUMNS_SET - group_by_set), dropna=False)
 
     def _func_reduce(df_group: pd.DataFrame) -> Optional[pd.Series]:
-
         if df_group.shape[0] == 0:
             print("empty group")
             return None
@@ -64,9 +61,7 @@ def _reduce_op(
 
         return first_row
 
-    df_reduced = grouped.apply(
-        func=_func_reduce
-    )
+    df_reduced = grouped.apply(func=_func_reduce)
 
     return df_reduced
 
@@ -84,32 +79,36 @@ def main():
     )
 
     parser.add_argument(
-        "-c", "--concat", type=str,
+        "-c",
+        "--concat",
+        type=str,
         help=f"Concat across. Can be any combination of {', '.join(REDUCE_COLUMNS)} separated by spaces. "
-             f"Output data will be grouped by the set difference.",
-        default="ses"
+        f"Output data will be grouped by the set difference.",
+        default="ses",
     )
 
     parser.add_argument(
-        "-d", "--dry_run",
+        "-d",
+        "--dry_run",
         action="store_true",
         help="Dry run. Print output directory structure instead of actually doing something. "
-             "If this is enabled 'bids_dir' may be a path to a bids2table parquet directory.",
-        default=False
+        "If this is enabled 'bids_dir' may be a path to a bids2table parquet directory.",
+        default=False,
     )
 
     parser.add_argument(
-        "-f", "--fake",
+        "-f",
+        "--fake",
         action="store_true",
         help="Fake output. Output a bids2table parquet directory instead of actually doing something.",
-        default=False
+        default=False,
     )
 
     args = parser.parse_args()
 
     input_dir: pl.Path = args.bids_dir
     output_dir: pl.Path = args.output_dir
-    concat_labels: List[str] = args.concat.split(' ')
+    concat_labels: List[str] = args.concat.split(" ")
     dry_run: bool = args.dry_run
     fake: bool = args.fake
     dry_run = dry_run or fake
@@ -140,8 +139,10 @@ def main():
     )
 
     def _process_group(df_group: pd.DataFrame) -> None:
-        group_identifiers = df_group.iloc[0][list(REDUCE_COLUMNS_SET - set(concat_labels))].to_dict()
-        print(f'Process group: {group_identifiers}')
+        group_identifiers = df_group.iloc[0][
+            list(REDUCE_COLUMNS_SET - set(concat_labels))
+        ].to_dict()
+        print(f"Process group: {group_identifiers}")
 
         first_row: pd.Series = df_group.iloc[0]
 
@@ -158,22 +159,22 @@ def main():
         # Generate sidecar
 
         sidecar_path = output_dir / sidecar_path_from_b2table_row(first_row)
-        sidecar_contents = first_row["sidecar"]  # TODO: Maybe add list of files that were concatenated?
+        sidecar_contents = first_row[
+            "sidecar"
+        ]  # TODO: Maybe add list of files that were concatenated?
         with open(sidecar_path, "w", encoding="utf-8") as fp:
             json.dump(sidecar_contents, fp)
 
     df_reduced_bold = _reduce_op(
         df_bold,
         group_by=concat_labels,
-        group_callback=None if dry_run else _process_group
+        group_callback=None if dry_run else _process_group,
     )
 
     if fake:
-        df_reduced_bold = df_reduced_bold.astype({
-            "sidecar": "json",
-            "dataset_description": "json",
-            "extra_entities": "json"
-        })
+        df_reduced_bold = df_reduced_bold.astype(
+            {"sidecar": "json", "dataset_description": "json", "extra_entities": "json"}
+        )
         df_reduced_bold.to_parquet(output_dir)
 
     filepaths = file_paths_from_b2table(df_reduced_bold, include_sidecars=True)

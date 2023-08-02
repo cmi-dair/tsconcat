@@ -53,24 +53,29 @@ def build_bidsapp_group_parser(*args, **kwargs):
     return parser
 
 
-def file_paths_from_b2table(df: pd.DataFrame, include_sidecars=False, inplace=False) -> List[pl.Path]:
+def file_paths_from_b2table(
+    df: pd.DataFrame, include_sidecars=False, inplace=False
+) -> List[pl.Path]:
     """Generate list of filepaths from bids2table dataframe."""
 
     # b2t crashes if sidecar is not None
     if not inplace:
         df = df.copy()
-    df['sidecar'] = None
+    df["sidecar"] = None
 
-    paths = list(df.apply(
-        func=lambda row: bids2table.helpers.join_bids_path(row),
-        axis=1
-    ).values)
+    paths = list(
+        df.apply(func=lambda row: bids2table.helpers.join_bids_path(row), axis=1).values
+    )
 
     if include_sidecars:
-        sidecar_paths = list(df.apply(
-            func=lambda row: bids2table.helpers.join_bids_path({**row, "ext": ".json"}),
-            axis=1
-        ).values)
+        sidecar_paths = list(
+            df.apply(
+                func=lambda row: bids2table.helpers.join_bids_path(
+                    {**row, "ext": ".json"}
+                ),
+                axis=1,
+            ).values
+        )
         return paths + sidecar_paths
 
     return paths
@@ -82,7 +87,7 @@ def file_path_from_b2table_row(row: pd.Series, inplace=False, sidecar=False) -> 
     # b2t crashes if sidecar is not None
     if not inplace:
         row = row.copy()
-    row['sidecar'] = None
+    row["sidecar"] = None
 
     if sidecar:
         row = {**row, "ext": ".json"}
@@ -96,6 +101,6 @@ def sidecar_path_from_b2table_row(row: pd.Series, inplace=False) -> pl.Path:
     # b2t crashes if sidecar is not None
     if not inplace:
         row = row.copy()
-    row['sidecar'] = None
+    row["sidecar"] = None
 
     return bids2table.helpers.join_bids_path({**row, "ext": ".json"})

@@ -1,6 +1,6 @@
 import pathlib as pl
 from os import PathLike
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict
 
 from rich.console import Console
 
@@ -8,7 +8,7 @@ console = Console(highlight=False)
 
 
 def tree_from_paths(paths: List[Union[str, PathLike]]):
-    tree = {}
+    tree: Dict[str, dict] = {}
     for p in (pl.Path(p) for p in paths):
         parts = list(p.parts)
 
@@ -54,11 +54,11 @@ def tree_collapse(tree: dict):
     return tree
 
 
-INDENT_T = '├── '
-INDENT_L = '└── '
-INDENT_O = '    '
-INDENT_I = '│   '
-RAINBOW_COLORS = ['red', 'green', 'blue', 'magenta', 'cyan']
+INDENT_T = "├── "
+INDENT_L = "└── "
+INDENT_O = "    "
+INDENT_I = "│   "
+RAINBOW_COLORS = ["red", "green", "blue", "magenta", "cyan"]
 
 
 def tree_print(tree: dict, indents: Optional[List[bool]] = None):
@@ -73,18 +73,19 @@ def tree_print(tree: dict, indents: Optional[List[bool]] = None):
                 if level == len(indents)
                 else INDENT_I
             )
-            if ind else
-            INDENT_O
-            for level, ind in enumerate(indents + [True]) if level > 0
+            if ind
+            else INDENT_O
+            for level, ind in enumerate(indents + [True])
+            if level > 0
         ]
 
         indent_list = [
-            f'[{RAINBOW_COLORS[level % len(RAINBOW_COLORS)]}]{ind}[/]'
+            f"[{RAINBOW_COLORS[level % len(RAINBOW_COLORS)]}]{ind}[/]"
             for level, ind in enumerate(indent_list)
         ]
 
-        total_indent = ''.join(indent_list)
-        console.print(f'{total_indent}{k}')
+        total_indent = "".join(indent_list)
+        console.print(f"{total_indent}{k}")
         tree_print(v, indents + [not is_last_child])
 
 
@@ -92,9 +93,7 @@ def pretreeprint(paths: List[Union[str, PathLike]]):
     tree_print(tree_collapse(tree_from_paths(paths)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from glob import glob
 
-    pretreeprint(
-        list(glob("../../**", recursive=True))
-    )
+    pretreeprint(list(glob("../../**", recursive=True)))
