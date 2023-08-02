@@ -1,7 +1,6 @@
 import json
 import pathlib as pl
 from collections.abc import Callable
-from glob import glob
 from typing import List, Optional
 
 import bids2table.helpers
@@ -69,6 +68,13 @@ def _reduce_op(
     return df_reduced
 
 
+def _read_if_parquet(p: pl.Path, *args, **kwargs) -> Optional[pd.DataFrame]:
+    try:
+        return pd.read_parquet(p, *args, **kwargs)
+    except:  # noqa
+        return None
+
+
 def main():
     parser = build_bidsapp_group_parser(
         prog="ba-tsconcat", description="Concatenate MRI timeseries."
@@ -108,8 +114,7 @@ def main():
     if not input_dir.exists():
         raise Exception("Input directory does not exist.")
 
-    if dry_run and glob(str(input_dir) + '/*.parquet'):
-        df = pd.read_parquet(input_dir)
+    if dry_run and (df := _read_if_parquet(input_dir)) is not None:
         df = bids2table.helpers.flat_to_multi_columns(df)
     else:
         df = bids2table.bids2table(input_dir)
@@ -161,6 +166,11 @@ def main():
     )
 
     if fake:
+        df_reduced_bold = df_reduced_bold.astype({
+            "sidecar": "json",
+            "dataset_description": "json",
+            "extra_entities": "json"
+        })
         df_reduced_bold.to_parquet(output_dir)
 
     filepaths = file_paths_from_b2table(df_reduced_bold)
