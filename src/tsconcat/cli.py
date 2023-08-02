@@ -119,6 +119,9 @@ def main():
     else:
         df = bids2table.bids2table(input_dir)
 
+        if df.shape[0] == 0:
+            raise Exception("Empty BIDS dataset")
+
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -134,8 +137,8 @@ def main():
     )
 
     def _process_group(df_group: pd.DataFrame) -> None:
-        name = df_group.iloc[0][list(REDUCE_COLUMNS_SET - set(concat_labels))].to_dict()
-        print(f'df: {name}')
+        group_identifiers = df_group.iloc[0][list(REDUCE_COLUMNS_SET - set(concat_labels))].to_dict()
+        print(f'Process group: {group_identifiers}')
 
         first_row: pd.Series = df_group.iloc[0]
 
@@ -159,10 +162,7 @@ def main():
     df_reduced_bold = _reduce_op(
         df_bold,
         group_by=concat_labels,
-        group_callback=
-        lambda _: None
-        if dry_run else
-        _process_group
+        group_callback=None if dry_run else _process_group
     )
 
     if fake:
