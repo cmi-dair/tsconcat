@@ -7,7 +7,7 @@
 [![pages](https://img.shields.io/badge/api-docs-blue)](https://cmi-dair.github.io/tsconcat)
 
 
-BIDS App and python library for concatenating MRI time series.
+BIDS App and Python library for concatenating MRI time series.
 
 Inspired by [Cho et al. 2021](https://doi.org/10.1016/j.neuroimage.2020.117549).
 
@@ -38,7 +38,7 @@ pip install git+https://github.com/cmi-dair/tsconcat
 ba-tsconcat /path/to/input/bids /path/to/output group --concat ses --dry_run
 ```
 
-
+![image](https://github.com/cmi-dair/tsconcat/assets/33600480/501037b0-77c6-40fe-bc7d-a3575944b0c6)
 
 ## Usage
 
