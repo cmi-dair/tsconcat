@@ -44,7 +44,7 @@ ba-tsconcat /path/to/input/bids /path/to/output group --concat ses --dry_run
 
 ```sh
 ba-tsconcat --help
-usage: grag-tsconcat [-h] [-c CONCAT] [-d] [-f] bids_dir output_dir {group}
+usage: ba-tsconcat [-h] [-c CONCAT] [-d] [-f] bids_dir output_dir {group}
 
 Concatenate MRI timeseries.
 
