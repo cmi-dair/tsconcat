@@ -5,6 +5,8 @@ on:
 jobs:
   repo-sync:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     steps:
       - name: Checkout
@@ -14,4 +16,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source_repo_path: cmi-dair/template-python-repository
-
