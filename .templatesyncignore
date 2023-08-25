@@ -1,2 +1,13 @@
 .github/workflows/
-src/APP_NAME
+src
+tests
+pyproject.toml
+poetry.lock
+README.md
+setup
+LICENSE
+CODE
+SECURITY.md
+setup_template.py
+.pre-commit-config.yaml
+.gitignore
