@@ -1,69 +1,59 @@
-# `tsconcat`
+# CMI-DAIR Template Python Repository
 
-[![Build](https://github.com/cmi-dair/tsconcat/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/cmi-dair/tsconcat/actions/workflows/test.yaml?query=branch%3Amain)
-[![codecov](https://codecov.io/gh/cmi-dair/tsconcat/branch/main/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/cmi-dair/tsconcat)
+This is a template repository. Below is a checklist of things you should do to use it:
+
+- [ ] Run `setup_template.py` to set up the repository.
+- [ ] Rewrite this `README` file.
+- [ ] Update the pre-commit versions in `.pre-commit-config.yaml` and install the `pre-commit` hooks..
+- [ ] Update the `LICENSE` file to your desired license and set the year.
+- [ ] Update the supported versions in `SECURITY.md` or, if not relevant, delete this file.
+- [ ] Remove the placeholder src and test files, these are there merely to show how the CI works.
+- [ ] Grant third-party app permissions (e.g. Codecov) [here](https://github.com/organizations/cmi-dair/settings/installations), if necessary.
+- [ ] Either generate a `CODECOV_TOKEN` secret [here](https://github.com/cmi-dair/flowdump/blob/main/.github/workflows/python_tests.yaml) (if its a private repository) or remove the line `token: ${{ secrets.CODECOV_TOKEN }}`
+- [ ] API docs website: After the first successful build, go to the `Settings` tab of your repository, scroll down to the `GitHub Pages` section, and select `gh-pages` as the source. This will generate a link to your API docs.
+- [ ] Update stability badge in `README.md` to reflect the current state of the project. A list of stability badges to copy can be found [here](https://github.com/orangemug/stability-badges). The [node documentation](https://nodejs.org/docs/latest-v20.x/api/documentation.html#documentation_stability_index) can be used as a reference for the stability levels.
+
+# Project name
+
+[![Build](https://github.com/cmi-dair/template-python-repository/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/cmi-dair/template-python-repository/actions/workflows/test.yaml?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/cmi-dair/template-python-repository/branch/main/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/cmi-dair/template-python-repository)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![L-GPL License](https://img.shields.io/badge/license-L--GPL-blue.svg)](LICENSE)
-[![pages](https://img.shields.io/badge/api-docs-blue)](https://cmi-dair.github.io/tsconcat)
+![stability-wip](https://img.shields.io/badge/stability-work_in_progress-lightgrey.svg)
+[![L-GPL License](https://img.shields.io/badge/license-L--GPL-blue.svg)](https://github.com/cmi-dair/template-python-repository/blob/main/LICENSE)
+[![pages](https://img.shields.io/badge/api-docs-blue)](https://cmi-dair.github.io/template-python-repository)
 
-
-BIDS App and Python library for concatenating MRI time series.
-
-Inspired by [Cho et al. 2021](https://doi.org/10.1016/j.neuroimage.2020.117549).
+What problem does this tool solve?
 
 ## Features
 
-- Concatenate BOLD time series from multiple datasets, sessions, subjects or runs into a single file.
-- Dry run mode to check what the output directory will look like.
-- Fake mode to produce a [bids2table](https://github.com/cmi-dair/bids2table) compatible parquet output directory.
+- A few
+- Cool
+- Things
 
 ## Installation
 
-<!--
-Install this package via:
+Install this package via :
 
 ```sh
-pip install tsconcat
+pip install APP_NAME
 ```
 
-Or -->Get the newest development version via:
+Or get the newest development version via:
 
 ```sh
-pip install git+https://github.com/cmi-dair/tsconcat
+pip install git+https://github.com/cmi-dair/template-python-repository
 ```
 
 ## Quick start
 
-```sh
-ba-tsconcat /path/to/input/bids /path/to/output group --concat ses --dry_run
+Short tutorial, maybe with a
+
+```Python
+import APP_NAME
+
+APP_NAME.short_example()
 ```
-
-![image](https://github.com/cmi-dair/tsconcat/assets/33600480/501037b0-77c6-40fe-bc7d-a3575944b0c6)
-
-## Usage
-
-```sh
-ba-tsconcat --help
-usage: ba-tsconcat [-h] [-c CONCAT] [-d] [-f] bids_dir output_dir {group}
-
-Concatenate MRI timeseries.
-
-positional arguments:
-  bids_dir              Input BIDS folder path.
-  output_dir            Output BIDS folder path.
-  {group}               Processing stage, must be "group".
-
-options:
-  -h, --help            show this help message and exit
-  -c CONCAT, --concat CONCAT
-                        Concat across. Can be any combination of dataset, sub, ses, run separated by spaces. Output data will be grouped by the set difference.
-  -d, --dry_run         Dry run. Print output directory structure instead of actually doing something. If this is enabled 'bids_dir' may be a path to a bids2table parquet directory.
-  -f, --fake            Fake output. Output a bids2table parquet directory instead of actually doing something.
-```
-
-
 
 ## Links or References
 
-- [Impact of concatenating fMRI data on reliability for functional connectomics (Cho et al. 2021)](https://doi.org/10.1016/j.neuroimage.2020.117549)
-- [bids2table](https://github.com/cmi-dair/bids2table)
+- [https://www.wikipedia.de](https://www.wikipedia.de)

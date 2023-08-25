@@ -1,21 +1,14 @@
 [tool.poetry]
-name = "tsconcat"
+name = "app-name"
 version = "0.1.0"
 description = "A beautiful description."
 authors = ["Reinder Vos de Wael <reinder.vosdewael@childmind.org>"]
 license = "LGPL-2.1"
 readme = "README.md"
-packages = [{include = "tsconcat", from = "src"}]
+packages = [{include = "APP_NAME", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-elbow = { git = "https://github.com/cmi-dair/elbow.git", branch = "main" }
-bids2table = { git = "https://github.com/cmi-dair/bids2table.git", branch = "main" }
-pdoc = { version = "^14.0.0", optional = true }
-nibabel = "^5.1.0"
-numpy = "^1.25.1"
-pandas = "^2.0.3"
-rich = "^13.4.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.2"
@@ -24,6 +17,9 @@ black = "^23.3.0"
 isort = "^5.12.0"
 pre-commit = "^3.3.3"
 pytest-cov = "^4.1.0"
+
+[tool.poetry.group.docs.dependencies]
+pdoc = "^14.0.0"
 
 [tool.poetry.extras]
 docs = ["pdoc"]
@@ -39,6 +35,3 @@ pythonpath = [
 
 [tool.mypy]
 ignore_missing_imports = true
-
-[tool.poetry.scripts]
-ba-tsconcat = "tsconcat.cli:main"
