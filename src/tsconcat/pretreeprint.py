@@ -1,6 +1,6 @@
 import pathlib as pl
 from os import PathLike
-from typing import List, Union, Optional, Dict
+from typing import Dict, List, Optional, Union
 
 from rich.console import Console
 

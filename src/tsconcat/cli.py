@@ -9,13 +9,10 @@ import elbow.utils
 import pandas as pd
 
 from tsconcat.pretreeprint import pretreeprint
+
 from .concat import concat_nifti1_4d
-from .utils import (
-    build_bidsapp_group_parser,
-    file_path_from_b2table_row,
-    sidecar_path_from_b2table_row,
-    file_paths_from_b2table,
-)
+from .utils import (build_bidsapp_group_parser, file_path_from_b2table_row,
+                    file_paths_from_b2table, sidecar_path_from_b2table_row)
 
 elbow.utils.setup_logging("ERROR")
 
