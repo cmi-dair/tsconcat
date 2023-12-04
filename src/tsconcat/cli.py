@@ -5,7 +5,7 @@ import pathlib as pl
 from collections.abc import Callable
 from typing import List, Optional
 
-import bids2table.helpers
+import bids2table.table
 import elbow.dtypes  # noqa  makes pandas load json types as dicts from parquet
 import elbow.utils
 import pandas as pd
@@ -116,7 +116,7 @@ def main() -> None:
         raise Exception("Input directory does not exist.")
 
     if dry_run and (df := _read_if_parquet(input_dir)) is not None:
-        df = bids2table.helpers.flat_to_multi_columns(df)
+        df = bids2table.table.flat_to_multi_columns(df)
     else:
         df = bids2table.bids2table(input_dir)
 
