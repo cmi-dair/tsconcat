@@ -1,19 +1,19 @@
+"""Utility functions for tsconcat."""
+
 import argparse
 import datetime
 import pathlib as pl
 import time
 from contextlib import contextmanager
-from typing import List
+from typing import Generator, List
 
 import bids2table.helpers
 import pandas as pd
 
 
 @contextmanager
-def timeprint(title: str):
-    """
-    Context manager to print the time elapsed between entering and exiting the
-    context.
+def timeprint(title: str) -> Generator[None, None, None]:
+    """Context manager to print the time elapsed between entering and exiting the context.
 
     Args:
         title: Title to be printed before and after the context.
@@ -25,15 +25,13 @@ def timeprint(title: str):
     print(f"Done: {title} - {datetime.timedelta(seconds=duration)}")
 
 
-def build_bidsapp_group_parser(*args, **kwargs):
-    """
-    Build a parser skeleton for the BIDS App group level.
+def build_bidsapp_group_parser(*args, **kwargs):  # noqa
+    """Build a parser skeleton for the BIDS App group level.
 
     Args:
         args: Positional arguments to be passed to ArgumentParser costructor.
         kwargs: Keyword arguments to be passed to ArgumentParser costructor.
     """
-
     parser = argparse.ArgumentParser(*args, **kwargs)
     parser.add_argument(
         "bids_dir",
@@ -47,32 +45,23 @@ def build_bidsapp_group_parser(*args, **kwargs):
         type=pl.Path,
         help="Output BIDS folder path.",
     )
-    parser.add_argument(
-        "analysis_level", choices=["group"], help='Processing stage, must be "group".'
-    )
+    parser.add_argument("analysis_level", choices=["group"], help='Processing stage, must be "group".')
     return parser
 
 
-def file_paths_from_b2table(
-    df: pd.DataFrame, include_sidecars=False, inplace=False
-) -> List[pl.Path]:
+def file_paths_from_b2table(df: pd.DataFrame, include_sidecars: bool = False, inplace: bool = False) -> List[pl.Path]:
     """Generate list of filepaths from bids2table dataframe."""
-
     # b2t crashes if sidecar is not None
     if not inplace:
         df = df.copy()
     df["sidecar"] = None
 
-    paths = list(
-        df.apply(func=lambda row: bids2table.helpers.join_bids_path(row), axis=1).values
-    )
+    paths = list(df.apply(func=lambda row: bids2table.helpers.join_bids_path(row), axis=1).values)
 
     if include_sidecars:
         sidecar_paths = list(
             df.apply(
-                func=lambda row: bids2table.helpers.join_bids_path(
-                    {**row, "ext": ".json"}
-                ),
+                func=lambda row: bids2table.helpers.join_bids_path({**row, "ext": ".json"}),
                 axis=1,
             ).values
         )
@@ -81,9 +70,8 @@ def file_paths_from_b2table(
     return paths
 
 
-def file_path_from_b2table_row(row: pd.Series, inplace=False, sidecar=False) -> pl.Path:
+def file_path_from_b2table_row(row: pd.Series, inplace: bool = False, sidecar: bool = False) -> pl.Path:
     """Generate list of filepaths from bids2table dataframe."""
-
     # b2t crashes if sidecar is not None
     if not inplace:
         row = row.copy()
@@ -95,9 +83,8 @@ def file_path_from_b2table_row(row: pd.Series, inplace=False, sidecar=False) -> 
     return bids2table.helpers.join_bids_path(row)
 
 
-def sidecar_path_from_b2table_row(row: pd.Series, inplace=False) -> pl.Path:
+def sidecar_path_from_b2table_row(row: pd.Series, inplace: bool = False) -> pl.Path:
     """Generate list of filepaths from bids2table dataframe."""
-
     # b2t crashes if sidecar is not None
     if not inplace:
         row = row.copy()

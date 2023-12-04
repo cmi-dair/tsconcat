@@ -1,5 +1,4 @@
-"""
-Concatenate MRI time series data
+"""Concatenate MRI time series data.
 
 Usage:
     tsconcat bids_dir output_dir group [options]

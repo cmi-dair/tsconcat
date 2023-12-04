@@ -1,13 +1,15 @@
+"""Print a tree from a list of paths."""
+
 import pathlib as pl
-from os import PathLike
-from typing import List, Union, Optional, Dict
+from typing import Dict, List, Optional, Sequence, Union
 
 from rich.console import Console
 
 console = Console(highlight=False)
 
 
-def tree_from_paths(paths: List[Union[str, PathLike]]):
+def tree_from_paths(paths: Sequence[Union[str, pl.Path]]) -> dict:
+    """Build a tree from a list of paths."""
     tree: Dict[str, dict] = {}
     for p in (pl.Path(p) for p in paths):
         parts = list(p.parts)
@@ -28,7 +30,8 @@ def tree_from_paths(paths: List[Union[str, PathLike]]):
     return tree
 
 
-def tree_collapse(tree: dict):
+def tree_collapse(tree: dict) -> dict:
+    """Collapse a tree by merging single-child nodes."""
     stack = [tree]
     while True:
         if len(stack) == 0:
@@ -61,27 +64,21 @@ INDENT_I = "│   "
 RAINBOW_COLORS = ["red", "green", "blue", "magenta", "cyan"]
 
 
-def tree_print(tree: dict, indents: Optional[List[bool]] = None):
+def tree_print(tree: dict, indents: Optional[List[bool]] = None) -> None:
+    """Print a tree."""
     indents = [] if indents is None else indents
 
     for i, (k, v) in enumerate(tree.items()):
         is_last_child = i == len(tree) - 1
 
         indent_list = [
-            (
-                (INDENT_L if is_last_child else INDENT_T)
-                if level == len(indents)
-                else INDENT_I
-            )
-            if ind
-            else INDENT_O
+            ((INDENT_L if is_last_child else INDENT_T) if level == len(indents) else INDENT_I) if ind else INDENT_O
             for level, ind in enumerate(indents + [True])
             if level > 0
         ]
 
         indent_list = [
-            f"[{RAINBOW_COLORS[level % len(RAINBOW_COLORS)]}]{ind}[/]"
-            for level, ind in enumerate(indent_list)
+            f"[{RAINBOW_COLORS[level % len(RAINBOW_COLORS)]}]{ind}[/]" for level, ind in enumerate(indent_list)
         ]
 
         total_indent = "".join(indent_list)
@@ -89,7 +86,8 @@ def tree_print(tree: dict, indents: Optional[List[bool]] = None):
         tree_print(v, indents + [not is_last_child])
 
 
-def pretreeprint(paths: List[Union[str, PathLike]]):
+def pretreeprint(paths: Sequence[Union[str, pl.Path]]) -> None:
+    """Print a tree from a list of paths."""
     tree_print(tree_collapse(tree_from_paths(paths)))
 
 

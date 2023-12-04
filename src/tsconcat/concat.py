@@ -1,3 +1,5 @@
+"""Concatenate 4D Nifti files."""
+
 import pathlib as pl
 from os import PathLike
 from typing import Iterable, List, Union
@@ -6,11 +8,8 @@ import nibabel as nib
 import numpy as np
 
 
-def concat_nifti1_4d(
-    paths: Iterable[Union[str, PathLike]], out_path: Union[str, PathLike]
-) -> None:
-    """
-    Concat 4D Nifti files.
+def concat_nifti1_4d(paths: Iterable[Union[str, PathLike]], out_path: Union[str, PathLike]) -> None:
+    """Concat 4D Nifti files.
 
     Args:
         paths: Paths to 4D Nifti files.

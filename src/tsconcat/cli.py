@@ -1,3 +1,5 @@
+"""CLI for tsconcat."""
+
 import json
 import pathlib as pl
 from collections.abc import Callable
@@ -8,13 +10,13 @@ import elbow.dtypes  # noqa  makes pandas load json types as dicts from parquet
 import elbow.utils
 import pandas as pd
 
-from tsconcat.pretreeprint import pretreeprint
 from .concat import concat_nifti1_4d
+from .pretreeprint import pretreeprint
 from .utils import (
     build_bidsapp_group_parser,
     file_path_from_b2table_row,
-    sidecar_path_from_b2table_row,
     file_paths_from_b2table,
+    sidecar_path_from_b2table_row,
 )
 
 elbow.utils.setup_logging("ERROR")
@@ -26,12 +28,10 @@ REDUCE_COLUMNS_SET = set(REDUCE_COLUMNS)
 def _reduce_op(
     df: pd.DataFrame,
     group_by: List[str],
-    inplace=False,
+    inplace: bool = False,
     group_callback: Optional[Callable[[pd.DataFrame], None]] = None,
-):
-    """
-    Reduce dataframe to one row per group.
-    """
+) -> pd.DataFrame:
+    """Reduce dataframe to one row per group."""
     if not inplace:
         df = df.copy()
 
@@ -66,17 +66,16 @@ def _reduce_op(
     return df_reduced
 
 
-def _read_if_parquet(p: pl.Path, *args, **kwargs) -> Optional[pd.DataFrame]:
+def _read_if_parquet(p: pl.Path, *args, **kwargs) -> Optional[pd.DataFrame]:  # noqa
     try:
         return pd.read_parquet(p, *args, **kwargs)
     except:  # noqa
         return None
 
 
-def main():
-    parser = build_bidsapp_group_parser(
-        prog="ba-tsconcat", description="Concatenate MRI timeseries."
-    )
+def main() -> None:
+    """Concatenate MRI timeseries."""
+    parser = build_bidsapp_group_parser(prog="ba-tsconcat", description="Concatenate MRI timeseries.")
 
     parser.add_argument(
         "-c",
@@ -139,9 +138,7 @@ def main():
     )
 
     def _process_group(df_group: pd.DataFrame) -> None:
-        group_identifiers = df_group.iloc[0][
-            list(REDUCE_COLUMNS_SET - set(concat_labels))
-        ].to_dict()
+        group_identifiers = df_group.iloc[0][list(REDUCE_COLUMNS_SET - set(concat_labels))].to_dict()
         print(f"Process group: {group_identifiers}")
 
         first_row: pd.Series = df_group.iloc[0]
@@ -159,9 +156,7 @@ def main():
         # Generate sidecar
 
         sidecar_path = output_dir / sidecar_path_from_b2table_row(first_row)
-        sidecar_contents = first_row[
-            "sidecar"
-        ]  # TODO: Maybe add list of files that were concatenated?
+        sidecar_contents = first_row["sidecar"]  # TODO: Maybe add list of files that were concatenated?
         with open(sidecar_path, "w", encoding="utf-8") as fp:
             json.dump(sidecar_contents, fp)
 
