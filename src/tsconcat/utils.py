@@ -7,7 +7,7 @@ import time
 from contextlib import contextmanager
 from typing import Generator, List
 
-import bids2table.helpers
+import bids2table.table
 import pandas as pd
 
 
@@ -56,12 +56,12 @@ def file_paths_from_b2table(df: pd.DataFrame, include_sidecars: bool = False, in
         df = df.copy()
     df["sidecar"] = None
 
-    paths = list(df.apply(func=lambda row: bids2table.helpers.join_bids_path(row), axis=1).values)
+    paths = list(df.apply(func=lambda row: bids2table.table.join_bids_path(row), axis=1).values)
 
     if include_sidecars:
         sidecar_paths = list(
             df.apply(
-                func=lambda row: bids2table.helpers.join_bids_path({**row, "ext": ".json"}),
+                func=lambda row: bids2table.table.join_bids_path({**row, "ext": ".json"}),
                 axis=1,
             ).values
         )
@@ -80,7 +80,7 @@ def file_path_from_b2table_row(row: pd.Series, inplace: bool = False, sidecar: b
     if sidecar:
         row = {**row, "ext": ".json"}
 
-    return bids2table.helpers.join_bids_path(row)
+    return bids2table.table.join_bids_path(row)
 
 
 def sidecar_path_from_b2table_row(row: pd.Series, inplace: bool = False) -> pl.Path:
@@ -90,4 +90,4 @@ def sidecar_path_from_b2table_row(row: pd.Series, inplace: bool = False) -> pl.P
         row = row.copy()
     row["sidecar"] = None
 
-    return bids2table.helpers.join_bids_path({**row, "ext": ".json"})
+    return bids2table.table.join_bids_path({**row, "ext": ".json"})
