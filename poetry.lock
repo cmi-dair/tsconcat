@@ -360,31 +360,31 @@ files = [
 
 [[package]]
 name = "nibabel"
-version = "5.1.0"
+version = "5.2.0"
 description = "Access a multitude of neuroimaging data formats"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "nibabel-5.1.0-py3-none-any.whl", hash = "sha256:b3deb8130c835b9d26e80880b0d5e443d9e3f30972b3b0302dd2fafa3ca629f8"},
-    {file = "nibabel-5.1.0.tar.gz", hash = "sha256:ce73ca5e957209e7219a223cb71f77235c9df2acf4d3f27f861ba38e9481ac53"},
+    {file = "nibabel-5.2.0-py3-none-any.whl", hash = "sha256:77724af6e29fd9c4173702e4d031e7d8c45b5963887905a0f90edab880381b7f"},
+    {file = "nibabel-5.2.0.tar.gz", hash = "sha256:3df8f1ab981d1bd92f4331d565528d126ab9717fdbd4cfe68f43fcd1c2bf3f52"},
 ]
 
 [package.dependencies]
-numpy = ">=1.19"
+numpy = ">=1.20"
 packaging = ">=17"
 
 [package.extras]
-all = ["nibabel[dev,dicomfs,doc,minc2,spm,style,test,zstd]"]
-dev = ["gitpython", "nibabel[style]", "twine"]
+all = ["nibabel[dicomfs,minc2,spm,zstd]"]
+dev = ["tox"]
 dicom = ["pydicom (>=1.0.0)"]
 dicomfs = ["nibabel[dicom]", "pillow"]
-doc = ["matplotlib (>=1.5.3)", "numpydoc", "sphinx (>=5.3,<6.0)", "texext", "tomli"]
-doctest = ["nibabel[doc,test]"]
+doc = ["matplotlib (>=1.5.3)", "numpydoc", "sphinx", "texext", "tomli"]
+doctest = ["tox"]
 minc2 = ["h5py"]
 spm = ["scipy"]
-style = ["blue", "flake8", "isort"]
-test = ["coverage", "pytest (!=5.3.4)", "pytest-cov", "pytest-doctestplus", "pytest-httpserver", "pytest-xdist"]
-typing = ["importlib-resources", "mypy", "pydicom", "pytest", "pyzstd", "types-pillow", "types-setuptools"]
+style = ["tox"]
+test = ["pytest", "pytest-cov", "pytest-doctestplus", "pytest-httpserver", "pytest-xdist"]
+typing = ["tox"]
 zstd = ["pyzstd (>=0.14.3)"]
 
 [[package]]
@@ -915,4 +915,4 @@ docs = ["pdoc"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c7248078026ad641095e7719727e2fd09f082c8ff776217eb6a197a9c4dd07c6"
+content-hash = "f845b26279066cd596543d6a198dcea0cc3ffb2e14211cf6d543008a8e641aea"
