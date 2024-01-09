@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "tsconcat"
+name = "ba-tsconcat"
 version = "0.1.0"
-description = "A beautiful description."
-authors = ["Reinder Vos de Wael <reinder.vosdewael@childmind.org>"]
+description = "BIDS App and Python library for concatenating MRI time series."
+authors = ["CMI DAIR Center <florian.rupprecht@childmind.org>"]
 license = "LGPL-2.1"
 readme = "README.md"
 packages = [{include = "tsconcat", from = "src"}]
