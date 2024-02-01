@@ -13,7 +13,7 @@ bids2table = "^0.1.0a0"
 pdoc = {version = "^14.3.0", optional = true}
 nibabel = "^5.2.0"
 numpy = "^1.26.3"
-pandas = "<2.1"  # 2.1.x breaks bids2table/elbow
+pandas = "<2.3"  # 2.1.x breaks bids2table/elbow
 rich = "^13.4.2"
 
 [tool.poetry.group.dev.dependencies]
