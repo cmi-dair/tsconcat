@@ -17,11 +17,11 @@ pandas = "<2.1"  # 2.1.x breaks bids2table/elbow
 rich = "^13.4.2"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.3"
+pytest = ">=7.4.3,<9.0.0"
 mypy = "^1.8.0"
 pre-commit = "^3.6.0"
-pytest-cov = "^4.1.0"
-ruff = "^0.1.8"
+pytest-cov = ">=4.1,<6.0"
+ruff = ">=0.1.8,<0.4.0"
 
 [tool.poetry.group.docs.dependencies]
 pdoc = "^14.3.0"
