@@ -103,6 +103,15 @@ def main() -> None:
         default=False,
     )
 
+    # workers
+    parser.add_argument(
+        "-w",
+        "--workers",
+        type=int,
+        help="Number of workers for bids2table. Default is 1.",
+        default=1,
+    )
+
     args = parser.parse_args()
 
     input_dir: pl.Path = args.bids_dir
@@ -111,6 +120,7 @@ def main() -> None:
     dry_run: bool = args.dry_run
     fake: bool = args.fake
     dry_run = dry_run or fake
+    workers: int = args.workers
 
     if not input_dir.exists():
         raise Exception("Input directory does not exist.")
@@ -118,7 +128,7 @@ def main() -> None:
     if dry_run and (df := _read_if_parquet(input_dir)) is not None:
         df = bids2table.table.flat_to_multi_columns(df)
     else:
-        df = bids2table.bids2table(input_dir)
+        df = bids2table.bids2table(input_dir, workers=workers)
 
         if df.shape[0] == 0:
             raise Exception("Empty BIDS dataset")
