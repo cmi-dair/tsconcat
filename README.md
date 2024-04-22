@@ -7,7 +7,6 @@
 [![L-GPL License](https://img.shields.io/badge/license-L--GPL-blue.svg)](LICENSE)
 [![pages](https://img.shields.io/badge/api-docs-blue)](https://childmindresearch.github.io/tsconcat)
 
-
 BIDS App and Python library for concatenating MRI time series.
 
 Inspired by [Cho et al. 2021](https://doi.org/10.1016/j.neuroimage.2020.117549).
@@ -61,8 +60,6 @@ options:
   -d, --dry_run         Dry run. Print output directory structure instead of actually doing something. If this is enabled 'bids_dir' may be a path to a bids2table parquet directory.
   -f, --fake            Fake output. Output a bids2table parquet directory instead of actually doing something.
 ```
-
-
 
 ## Links or References
 

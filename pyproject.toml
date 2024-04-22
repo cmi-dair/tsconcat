@@ -8,12 +8,11 @@ readme = "README.md"
 packages = [{include = "tsconcat", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
-bids2table = "^0.1.0a0"
-pdoc = {version = "^14.3.0", optional = true}
+python = "^3.10"
+bids2table = "^0.1.0b0"
 nibabel = "^5.2.0"
 numpy = "^1.26.3"
-pandas = "<2.1"  # 2.1.x breaks bids2table/elbow
+pandas = ">1.0"
 rich = "^13.4.2"
 
 [tool.poetry.group.dev.dependencies]
@@ -24,10 +23,7 @@ pytest-cov = "^4.1.0"
 ruff = "^0.1.8"
 
 [tool.poetry.group.docs.dependencies]
-pdoc = "^14.3.0"
-
-[tool.poetry.extras]
-docs = ["pdoc"]
+pdoc = "^14.4.0"
 
 [tool.poetry.scripts]
 ba-tsconcat = "tsconcat.cli:main"
