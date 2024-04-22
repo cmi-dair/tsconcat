@@ -126,16 +126,19 @@ def main() -> None:
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
 
-    # We dont care about these
-    df = df.droplevel(0, axis="columns")
+    # print dataframe columns
+    print(df.columns)
 
     df_bold = df.query(
-        "datatype == 'func' and "
-        "ext == '.nii.gz' and "
-        "suffix == 'bold' and "
-        "desc == 'preproc' and "
-        "space == 'MNI152NLin6ASym'"
+        "ent__datatype == 'func' and "
+        "ent__ext == '.nii.gz' and "
+        "ent__suffix == 'bold' and "
+        "ent__desc == 'preproc' and "
+        "ent__space == 'MNI152NLin6ASym'"
     )
+
+    if df_bold.shape[0] == 0:
+        raise Exception("No BOLD files found")
 
     def _process_group(df_group: pd.DataFrame) -> None:
         group_identifiers = df_group.iloc[0][list(REDUCE_COLUMNS_SET - set(concat_labels))].to_dict()
