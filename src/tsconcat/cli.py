@@ -21,8 +21,16 @@ from .utils import (
 
 elbow.utils.setup_logging("ERROR")
 
-REDUCE_COLUMNS = ["dataset", "sub", "ses", "run"]
+REDUCE_COLUMNS = ["ds__dataset", "ent__sub", "ent__ses", "ent__run"]
 REDUCE_COLUMNS_SET = set(REDUCE_COLUMNS)
+REDUCE_COLUMNS_ALIAS = {
+    "dataset": "ds__dataset",
+    "sub": "ent__sub",
+    "subject": "ent__sub",
+    "ses": "ent__ses",
+    "session": "ent__ses",
+    "run": "ent__run",
+}
 
 
 def _reduce_op(
@@ -35,7 +43,7 @@ def _reduce_op(
     if not inplace:
         df = df.copy()
 
-    group_by_set = set(group_by)
+    group_by_set = set(REDUCE_COLUMNS_ALIAS.get(g, g) for g in group_by)
 
     unknown_cols = list(group_by_set - REDUCE_COLUMNS_SET)
     if len(unknown_cols) > 0:
@@ -81,7 +89,7 @@ def main() -> None:
         "-c",
         "--concat",
         type=str,
-        help=f"Concat across. Can be any combination of {', '.join(REDUCE_COLUMNS)} separated by spaces. "
+        help=f"Concat across. Can be any combination of {', '.join(REDUCE_COLUMNS_ALIAS.keys())} separated by spaces. "
         f"Output data will be grouped by the set difference.",
         default="ses",
     )
@@ -142,10 +150,13 @@ def main() -> None:
     df_bold = df.query(
         "ent__datatype == 'func' and "
         "ent__ext == '.nii.gz' and "
-        "ent__suffix == 'bold' and "
-        "ent__desc == 'preproc' and "
-        "ent__space == 'MNI152NLin6ASym'"
+        "ent__suffix == 'bold'"# and "
+        #"ent__desc == 'preproc' and "
+        #"ent__space == 'MNI152NLin6ASym'"
     )
+
+    print(df)
+    print(df_bold)
 
     if df_bold.shape[0] == 0:
         raise Exception("No BOLD files found")
@@ -164,12 +175,12 @@ def main() -> None:
         file_path = output_dir / file_path_from_b2table_row(first_row)
 
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        concat_nifti1_4d(paths=df_group.file_path.values, out_path=file_path)
+        concat_nifti1_4d(paths=df_group.finfo__file_path.values, out_path=file_path)
 
         # Generate sidecar
 
         sidecar_path = output_dir / sidecar_path_from_b2table_row(first_row)
-        sidecar_contents = first_row["sidecar"]  # TODO: Maybe add list of files that were concatenated?
+        sidecar_contents = first_row["meta__json"]  # TODO: Maybe add list of files that were concatenated?
         with open(sidecar_path, "w", encoding="utf-8") as fp:
             json.dump(sidecar_contents, fp)
 
