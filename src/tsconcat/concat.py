@@ -29,7 +29,7 @@ def concat_nifti1_4d(paths: Iterable[Union[str, PathLike]], out_path: Union[str,
     img_shapes: List[tuple] = [img.shape for img in img_handles]
 
     # All 4D
-    if not np.all([len(img_shapes) == 4]):
+    if not np.all([len(shape) == 4 for shape in img_shapes]):
         raise Exception("Images must be 4D.")
 
     # First 3 dimensions must be equal
