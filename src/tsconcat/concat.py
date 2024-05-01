@@ -26,12 +26,23 @@ def concat_nifti1_4d(paths: Iterable[Union[str, PathLike]], out_path: Union[str,
 
     img_handles: List[nib.nifti1.Nifti1Image] = [nib.nifti1.Nifti1Image.load(p) for p in paths]  # type: ignore
 
+    img_shapes: List[tuple] = [img.shape for img in img_handles]
+
+    # All 4D
+    if not np.all([len(img_shapes) == 4]):
+        raise Exception("Images must be 4D.")
+
+    # First 3 dimensions must be equal
+    if not np.all([img_shapes[0][:-1] == shape[:-1] for shape in img_shapes]):
+        raise Exception("Spatial shapes must be equal.")
+
     img_affines: List[np.ndarray] = [img.affine for img in img_handles]
 
     affs = np.asarray(img_affines)
     if not np.all(affs == affs[0, :, :]):
         raise Exception("Affines must be equal.")
 
+    # Should this use the _dataobj to preserve integer types?
     img_arrays = [img.get_fdata() for img in img_handles]
 
     concat = np.concatenate(img_arrays, axis=3)

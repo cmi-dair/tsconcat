@@ -25,7 +25,7 @@ def timeprint(title: str) -> Generator[None, None, None]:
     print(f"Done: {title} - {datetime.timedelta(seconds=duration)}")
 
 
-def build_bidsapp_group_parser(*args, **kwargs):  # noqa
+def build_bidsapp_group_parser(*args, **kwargs) -> argparse.ArgumentParser:  # noqa
     """Build a parser skeleton for the BIDS App group level.
 
     Args:
@@ -54,7 +54,7 @@ def file_paths_from_b2table(df: pd.DataFrame, include_sidecars: bool = False, in
     # b2t crashes if sidecar is not None
     if not inplace:
         df = df.copy()
-    df["sidecar"] = None
+    df["meta__json"] = None
 
     paths = list(df.apply(func=lambda row: bids2table.table.join_bids_path(row), axis=1).values)
 
@@ -75,7 +75,7 @@ def file_path_from_b2table_row(row: pd.Series, inplace: bool = False, sidecar: b
     # b2t crashes if sidecar is not None
     if not inplace:
         row = row.copy()
-    row["sidecar"] = None
+    row["meta__json"] = None
 
     if sidecar:
         row = {**row, "ext": ".json"}
@@ -88,6 +88,6 @@ def sidecar_path_from_b2table_row(row: pd.Series, inplace: bool = False) -> pl.P
     # b2t crashes if sidecar is not None
     if not inplace:
         row = row.copy()
-    row["sidecar"] = None
+    row["meta__json"] = None
 
     return bids2table.table.join_bids_path({**row, "ext": ".json"})

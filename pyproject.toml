@@ -66,10 +66,11 @@ src = ["src"]
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["ANN", "D", "E", "F", "I"]
+select = ["ANN", "D", "E", "F", "I", "PD", "NPY"]
 ignore = [
   "ANN101",  # self should not be annotated.
-  "ANN102"  # cls should not be annotated.
+  "ANN102",  # cls should not be annotated.
+  "PD901"  # Avoid using the generic variable name df for DataFrames
 ]
 fixable = ["ALL"]
 unfixable = []

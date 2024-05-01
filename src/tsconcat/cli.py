@@ -1,9 +1,11 @@
 """CLI for tsconcat."""
 
+import argparse
 import json
 import pathlib as pl
 from collections.abc import Callable
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import Any, List, Optional
 
 import bids2table.table
 import elbow.dtypes  # noqa  makes pandas load json types as dicts from parquet
@@ -50,7 +52,7 @@ def _reduce_op(
         raise Exception(f"Unknown columns: {unknown_cols}")
     del unknown_cols
 
-    df.sort_values(by=REDUCE_COLUMNS, inplace=True)
+    df = df.sort_values(by=REDUCE_COLUMNS)
 
     grouped = df.groupby(by=list(REDUCE_COLUMNS_SET - group_by_set), dropna=False)
 
@@ -81,8 +83,8 @@ def _read_if_parquet(p: pl.Path, *args, **kwargs) -> Optional[pd.DataFrame]:  # 
         return None
 
 
-def main() -> None:
-    """Concatenate MRI timeseries."""
+def build_parser_tsconcat_bids_app() -> argparse.ArgumentParser:
+    """Build parser for tsconcat BIDS app."""
     parser = build_bidsapp_group_parser(prog="ba-tsconcat", description="Concatenate MRI timeseries.")
 
     parser.add_argument(
@@ -120,81 +122,95 @@ def main() -> None:
         default=1,
     )
 
-    args = parser.parse_args()
+    return parser
 
-    input_dir: pl.Path = args.bids_dir
-    output_dir: pl.Path = args.output_dir
-    concat_labels: List[str] = args.concat.split(" ")
-    dry_run: bool = args.dry_run
-    fake: bool = args.fake
-    dry_run = dry_run or fake
-    workers: int = args.workers
 
-    if not input_dir.exists():
+@dataclass
+class TSConcatSettings:
+    """Settings for tsconcat."""
+
+    input_dir: pl.Path
+    output_dir: pl.Path
+    concat_labels: List[str]
+    dry_run: bool
+    fake: bool
+    workers: int
+
+    @classmethod
+    def from_args(cls, args: Any) -> "TSConcatSettings":  # noqa
+        return cls(
+            input_dir=args.bids_dir,
+            output_dir=args.output_dir,
+            concat_labels=args.concat.split(" "),
+            dry_run=args.dry_run or args.fake,
+            fake=args.fake,
+            workers=args.workers,
+        )
+
+
+def main() -> None:
+    """Concatenate MRI timeseries."""
+    settings = TSConcatSettings.from_args(build_parser_tsconcat_bids_app().parse_args())
+
+    if not settings.input_dir.exists():
         raise Exception("Input directory does not exist.")
 
-    if dry_run and (df := _read_if_parquet(input_dir)) is not None:
+    if settings.dry_run and (df := _read_if_parquet(settings.input_dir)) is not None:
         df = bids2table.table.flat_to_multi_columns(df)
     else:
-        df = bids2table.bids2table(input_dir, workers=workers)
+        df = bids2table.bids2table(settings.input_dir, workers=settings.workers)
 
         if df.shape[0] == 0:
             raise Exception("Empty BIDS dataset")
 
-    if not dry_run:
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-    # print dataframe columns
-    print(df.columns)
+    if not settings.dry_run:
+        settings.output_dir.mkdir(parents=True, exist_ok=True)
 
     df_bold = df.query(
         "ent__datatype == 'func' and "
         "ent__ext == '.nii.gz' and "
-        "ent__suffix == 'bold'"# and "
-        #"ent__desc == 'preproc' and "
-        #"ent__space == 'MNI152NLin6ASym'"
-    )
-
-    print(df)
-    print(df_bold)
+        "ent__suffix == 'bold'"  # and "
+        # "ent__desc == 'preproc' and "
+        # "ent__space == 'MNI152NLin6ASym'"
+    )  # fmt: skip
 
     if df_bold.shape[0] == 0:
         raise Exception("No BOLD files found")
 
     def _process_group(df_group: pd.DataFrame) -> None:
-        group_identifiers = df_group.iloc[0][list(REDUCE_COLUMNS_SET - set(concat_labels))].to_dict()
+        group_identifiers = df_group.iloc[0][list(REDUCE_COLUMNS_SET - set(settings.concat_labels))].to_dict()
         print(f"Process group: {group_identifiers}")
 
         first_row: pd.Series = df_group.iloc[0]
 
-        for group_label in concat_labels:
+        for group_label in settings.concat_labels:
             first_row[group_label] = None  # todo does vectorized work here?
 
         # Generate file
 
-        file_path = output_dir / file_path_from_b2table_row(first_row)
+        file_path = settings.output_dir / file_path_from_b2table_row(first_row)
 
         file_path.parent.mkdir(parents=True, exist_ok=True)
         concat_nifti1_4d(paths=df_group.finfo__file_path.values, out_path=file_path)
 
         # Generate sidecar
 
-        sidecar_path = output_dir / sidecar_path_from_b2table_row(first_row)
+        sidecar_path = settings.output_dir / sidecar_path_from_b2table_row(first_row)
         sidecar_contents = first_row["meta__json"]  # TODO: Maybe add list of files that were concatenated?
         with open(sidecar_path, "w", encoding="utf-8") as fp:
             json.dump(sidecar_contents, fp)
 
     df_reduced_bold = _reduce_op(
         df_bold,
-        group_by=concat_labels,
-        group_callback=None if dry_run else _process_group,
+        group_by=settings.concat_labels,
+        group_callback=None if settings.dry_run else _process_group,
     )
 
-    if fake:
+    if settings.fake:
         df_reduced_bold = df_reduced_bold.astype(
-            {"sidecar": "json", "dataset_description": "json", "extra_entities": "json"}
+            {"meta__json": "json", "ds__dataset_description": "json", "ent__extra_entities": "json"}
         )
-        df_reduced_bold.to_parquet(output_dir)
+        df_reduced_bold.to_parquet(settings.output_dir)
 
     filepaths = file_paths_from_b2table(df_reduced_bold, include_sidecars=True)
     pretreeprint(filepaths)
