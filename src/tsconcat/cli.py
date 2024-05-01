@@ -148,11 +148,9 @@ def main() -> None:
     print(df.columns)
 
     df_bold = df.query(
-        "ent__datatype == 'func' and "
-        "ent__ext == '.nii.gz' and "
-        "ent__suffix == 'bold'"# and "
-        #"ent__desc == 'preproc' and "
-        #"ent__space == 'MNI152NLin6ASym'"
+        "ent__datatype == 'func' and " "ent__ext == '.nii.gz' and " "ent__suffix == 'bold'"  # and "
+        # "ent__desc == 'preproc' and "
+        # "ent__space == 'MNI152NLin6ASym'"
     )
 
     print(df)
