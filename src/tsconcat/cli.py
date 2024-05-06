@@ -158,7 +158,7 @@ def main() -> None:
     if settings.dry_run and (df := _read_if_parquet(settings.input_dir)) is not None:
         df = bids2table.table.flat_to_multi_columns(df)
     else:
-        df = bids2table.bids2table(settings.input_dir, workers=settings.workers)
+        df = bids2table.bids2table(settings.input_dir, workers=settings.workers, with_meta=False)
 
         if df.shape[0] == 0:
             raise Exception("Empty BIDS dataset")
