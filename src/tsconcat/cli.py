@@ -9,8 +9,9 @@ from typing import Any, List, Optional
 
 import bids2table.table
 import elbow.dtypes  # noqa  makes pandas load json types as dicts from parquet
-import elbow.utils
 import pandas as pd
+
+from tsconcat.b2t_columns import B2tColumn
 
 from .concat import concat_nifti1_4d
 from .pretreeprint import pretreeprint
@@ -21,17 +22,22 @@ from .utils import (
     sidecar_path_from_b2table_row,
 )
 
-elbow.utils.setup_logging("ERROR")
-
-REDUCE_COLUMNS = ["ds__dataset", "ent__sub", "ent__ses", "ent__run"]
+REDUCE_COLUMNS = [
+    B2tColumn.Dataset,
+    B2tColumn.Subject,
+    B2tColumn.Session,
+    B2tColumn.Run,
+    B2tColumn.Description,
+    B2tColumn.Space,
+]
 REDUCE_COLUMNS_SET = set(REDUCE_COLUMNS)
 REDUCE_COLUMNS_ALIAS = {
-    "dataset": "ds__dataset",
-    "sub": "ent__sub",
-    "subject": "ent__sub",
-    "ses": "ent__ses",
-    "session": "ent__ses",
-    "run": "ent__run",
+    "dataset": B2tColumn.Dataset,
+    "sub": B2tColumn.Subject,
+    "subject": B2tColumn.Subject,
+    "ses": B2tColumn.Session,
+    "session": B2tColumn.Session,
+    "run": B2tColumn.Run,
 }
 
 
@@ -45,7 +51,7 @@ def _reduce_op(
     if not inplace:
         df = df.copy()
 
-    group_by_set = set(REDUCE_COLUMNS_ALIAS.get(g, g) for g in group_by)
+    group_by_set = set(group_by)
 
     unknown_cols = list(group_by_set - REDUCE_COLUMNS_SET)
     if len(unknown_cols) > 0:
@@ -54,16 +60,25 @@ def _reduce_op(
 
     df = df.sort_values(by=REDUCE_COLUMNS)
 
-    grouped = df.groupby(by=list(REDUCE_COLUMNS_SET - group_by_set), dropna=False)
+    group_by_columns = list(REDUCE_COLUMNS_SET - group_by_set)
+    # Duplicate group_by columns in df to retain them
+    # This used to be the default behavior of groupby.apply, but it was deprecated in pandas 2.2
+    for col in group_by_columns:
+        df[f"temp_copy_{col}"] = df[col]
+    grouped = df.groupby(by=group_by_columns, dropna=False)
 
     def _func_reduce(df_group: pd.DataFrame) -> Optional[pd.Series]:
         if df_group.shape[0] == 0:
             print("empty group")
             return None
 
+        # Name them back to normal
+        df_group = df_group.rename(columns={f"temp_copy_{col}": col for col in group_by_columns})
+
         first_row: pd.Series = df_group.iloc[0]
 
         for group_label in group_by:
+            first_row = first_row.copy()
             first_row[group_label] = None  # todo does vectorized work here?
 
         if group_callback is not None:
@@ -71,7 +86,8 @@ def _reduce_op(
 
         return first_row
 
-    df_reduced = grouped.apply(func=_func_reduce)
+    df_reduced = grouped.apply(func=_func_reduce, include_groups=False)
+    df_reduced = df_reduced.reset_index(drop=False)
 
     return df_reduced
 
@@ -138,10 +154,13 @@ class TSConcatSettings:
 
     @classmethod
     def from_args(cls, args: Any) -> "TSConcatSettings":  # noqa
+        concat_labels = args.concat.split(" ")
+        concat_set = set(REDUCE_COLUMNS_ALIAS.get(g, g) for g in concat_labels)
+
         return cls(
             input_dir=args.bids_dir,
             output_dir=args.output_dir,
-            concat_labels=args.concat.split(" "),
+            concat_labels=list(concat_set),
             dry_run=args.dry_run or args.fake,
             fake=args.fake,
             workers=args.workers,
@@ -167,9 +186,9 @@ def main() -> None:
         settings.output_dir.mkdir(parents=True, exist_ok=True)
 
     df_bold = df.query(
-        "ent__datatype == 'func' and "
-        "ent__ext == '.nii.gz' and "
-        "ent__suffix == 'bold'"  # and "
+        f"{B2tColumn.DataType} == 'func' and "
+        f"{B2tColumn.FileExtension} == '.nii.gz' and "
+        f"{B2tColumn.Suffix} == 'bold'"  # and "
         # "ent__desc == 'preproc' and "
         # "ent__space == 'MNI152NLin6ASym'"
     )  # fmt: skip
@@ -184,19 +203,24 @@ def main() -> None:
         first_row: pd.Series = df_group.iloc[0]
 
         for group_label in settings.concat_labels:
-            first_row[group_label] = None  # todo does vectorized work here?
+            first_row = first_row.copy()
+            first_row[group_label] = None
 
         # Generate file
 
         file_path = settings.output_dir / file_path_from_b2table_row(first_row)
 
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        concat_nifti1_4d(paths=df_group.finfo__file_path.values, out_path=file_path)
+        try:
+            concat_nifti1_4d(paths=df_group.finfo__file_path.values, out_path=file_path)
+        except Exception as e:
+            print(f"Warning: Could not concat group, skipping:\n{e}")
+            return
 
         # Generate sidecar
 
         sidecar_path = settings.output_dir / sidecar_path_from_b2table_row(first_row)
-        sidecar_contents = first_row["meta__json"]  # TODO: Maybe add list of files that were concatenated?
+        sidecar_contents = first_row[B2tColumn.MetaJson]  # TODO: Maybe add list of files that were concatenated?
         with open(sidecar_path, "w", encoding="utf-8") as fp:
             json.dump(sidecar_contents, fp)
 
@@ -207,8 +231,9 @@ def main() -> None:
     )
 
     if settings.fake:
+        # You need this one, believe me
         df_reduced_bold = df_reduced_bold.astype(
-            {"meta__json": "json", "ds__dataset_description": "json", "ent__extra_entities": "json"}
+            {B2tColumn.MetaJson: "json", B2tColumn.DatasetDescription: "json", B2tColumn.ExtraEntities: "json"}
         )
         df_reduced_bold.to_parquet(settings.output_dir)
 

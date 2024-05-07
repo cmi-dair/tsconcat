@@ -10,6 +10,8 @@ from typing import Generator, List
 import bids2table.table
 import pandas as pd
 
+from tsconcat.b2t_columns import B2tColumn
+
 
 @contextmanager
 def timeprint(title: str) -> Generator[None, None, None]:
@@ -45,7 +47,7 @@ def build_bidsapp_group_parser(*args, **kwargs) -> argparse.ArgumentParser:  # n
         type=pl.Path,
         help="Output BIDS folder path.",
     )
-    parser.add_argument("analysis_level", choices=["group"], help='Processing stage, must be "group".')
+    parser.add_argument("analysis_level", default="group", choices=["group"], help='Processing stage, must be "group".')
     return parser
 
 
@@ -54,14 +56,14 @@ def file_paths_from_b2table(df: pd.DataFrame, include_sidecars: bool = False, in
     # b2t crashes if sidecar is not None
     if not inplace:
         df = df.copy()
-    df["meta__json"] = None
+    df[B2tColumn.MetaJson] = None
 
     paths = list(df.apply(func=lambda row: bids2table.table.join_bids_path(row), axis=1).values)
 
     if include_sidecars:
         sidecar_paths = list(
             df.apply(
-                func=lambda row: bids2table.table.join_bids_path({**row, "ext": ".json"}),
+                func=lambda row: bids2table.table.join_bids_path({**row, B2tColumn.FileExtension: ".json"}),
                 axis=1,
             ).values
         )
@@ -75,10 +77,10 @@ def file_path_from_b2table_row(row: pd.Series, inplace: bool = False, sidecar: b
     # b2t crashes if sidecar is not None
     if not inplace:
         row = row.copy()
-    row["meta__json"] = None
+    row[B2tColumn.MetaJson] = None
 
     if sidecar:
-        row = {**row, "ext": ".json"}
+        row = {**row, B2tColumn.FileExtension: ".json"}
 
     return bids2table.table.join_bids_path(row)
 
@@ -88,6 +90,6 @@ def sidecar_path_from_b2table_row(row: pd.Series, inplace: bool = False) -> pl.P
     # b2t crashes if sidecar is not None
     if not inplace:
         row = row.copy()
-    row["meta__json"] = None
+    row[B2tColumn.MetaJson] = None
 
-    return bids2table.table.join_bids_path({**row, "ext": ".json"})
+    return bids2table.table.join_bids_path({**row, B2tColumn.FileExtension: ".json"})
