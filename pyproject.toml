@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ba-tsconcat"
-version = "0.1.2"
+version = "0.1.3"
 description = "BIDS App and Python library for concatenating MRI time series."
 authors = ["CMI DAIR Center <florian.rupprecht@childmind.org>"]
 license = "LGPL-2.1"
