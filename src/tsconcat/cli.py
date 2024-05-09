@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import logging
 import pathlib as pl
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -21,6 +22,9 @@ from .utils import (
     file_paths_from_b2table,
     sidecar_path_from_b2table_row,
 )
+
+# Set bids2table logger to error
+logging.getLogger("bids2table").setLevel(logging.ERROR)
 
 REDUCE_COLUMNS = [
     B2tColumn.Dataset,
@@ -87,7 +91,7 @@ def _reduce_op(
         return first_row
 
     df_reduced = grouped.apply(func=_func_reduce, include_groups=False)
-    df_reduced = df_reduced.reset_index(drop=False)
+    df_reduced = df_reduced.reset_index(drop=True)
 
     return df_reduced
 
